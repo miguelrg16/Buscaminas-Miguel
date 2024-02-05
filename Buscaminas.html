@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscaminas</title>
+    <link rel="stylesheet" href="Buscaminas.css">
+</head>
+<body>
+    <h1>Buscaminas</h1>
+    <div class="vidas">Vidas: <span id="contadorVidas">5</span></div>
+    <div id="tablero">
+
+    <script>
+
+        let matriz = [];
+        for (let i = 0; i < 10; i++) {
+        matriz[i] = Array(10).fill("vacia");
+        }
+
+        function rellenarMatriz() {
+            for (let i = 0; i < matriz.length; i++) {
+                for (let j = 0; j < matriz[i].length; j++) {
+                    matriz[i][j] = Math.round(Math.random());
+                }
+            }
+        }
+
+        function colocarMinas() {
+            let minas = 0;
+            while (minas < 10) {
+                let x = Math.floor(Math.random() * 10);
+                let y = Math.floor(Math.random() * 10);
+                if (matriz[x][y] != "mina") {
+                    matriz[x][y] = "mina";
+                    minas++;
+                }
+            }
+        }
+
+        const tableroElemento = document.getElementById('tablero');
+        for (let i = 0; i < matriz.length; i++) {
+            for (let j = 0; j < matriz[i].length; j++) {
+                const celda = document.createElement('div');
+                celda.classList.add('celda');
+                celda.dataset.fila = i;
+                celda.dataset.columna = j;
+                celda.addEventListener('click', clickCelda);
+                tableroElemento.appendChild(celda);
+            }
+            tableroElemento.appendChild(document.createElement('br'));
+        }
+
+        function clickCelda() {
+            const fila = parseInt(event.target.dataset.fila);
+            const columna = parseInt(event.target.dataset.columna);
+            const esMina = matriz[fila][columna] == "mina";
+
+            if (esMina) {
+                event.target.textContent = "💣";
+                contadorVidas--;
+                contadorVidasElemento.textContent = contadorVidas;
+
+                if (contadorVidas == 0) {
+                    console.log('¡Has perdido! Has encontrado 5 bombas.');
+                    reiniciarJuego();
+                }
+            } else {
+                const minasCercanas = contarMinasCercanas(fila, columna);
+                event.target.textContent = minasCercanas;
+            }
+        }
+
+        function contarMinasCercanas(fila, columna) {
+            let minasCercanas = 0;
+            for (let i = fila - 1; i <= fila + 1; i++) {
+                for (let j = columna - 1; j <= columna + 1; j++) {
+                    if (i >= 0 && i < 10 && j >= 0 && j < 10) {
+                        if (matriz[i][j] == "mina") {
+                            minasCercanas++;
+                        }
+                    }
+                }
+            }
+            return minasCercanas;
+        }
+
+        function reiniciarJuego() {
+            if (contadorVidas == 0) {
+                console.log('¡Has perdido! Has encontrado 5 bombas.');
+                reiniciarJuego();
+            }
+        }
+
+        rellenarMatriz();
+        colocarMinas();
+    </script>
+   
+</body>
+</html>
